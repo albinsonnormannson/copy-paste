@@ -1,0 +1,4 @@
+GET http://localhost:3000/api/clipboard HTTP/1.1
+
+###
+DELETE http://localhost:3000/api/clipboard/61 HTTP/1.1
