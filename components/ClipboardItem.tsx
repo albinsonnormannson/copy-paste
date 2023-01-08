@@ -2,7 +2,7 @@ import React, { useRef, createRef } from "react";
 import { AiFillDelete, AiOutlineDelete } from "react-icons/ai";
 import { FaPaste, FaCopy } from "react-icons/fa";
 import { useClipboardContext } from "./context/ClipboardContext";
-import { TooltipElement, useTooltip, withTooltip } from "./Tooltip";
+import { TooltipElement, TooltipRefType, useTooltip, withTooltip } from "./Tooltip";
 
 export type ClipboardItem = {
   id: any;
@@ -11,7 +11,7 @@ export type ClipboardItem = {
 };
 
 export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
-  const copyTooltipRef = useRef<TooltipElement>(null);
+  const copyTooltipRef = useRef<TooltipElement>(null) as TooltipRefType;
   const copyTooltip = useTooltip(copyTooltipRef);
   const { setClipboard } = useClipboardContext();
 
@@ -21,9 +21,7 @@ export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
     e.preventDefault();
 
     await navigator.clipboard.writeText(value.content);
-    // alert(await navigator.clipboard.readText());
 
-    // copyTooltip.setTooltip("Tooltip");
     copyTooltip.toggleTooltip();
   };
 
@@ -56,13 +54,13 @@ export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
       },
     }
   );
-  
+
   return (
     <div className="flex py-2 px-4 mb-2 bg-orange-200 rounded-sm">
       <div className="max-w-[90%] break-words">{value.content}</div>
       {/* <span className="text-sm text-green-300">{value.createdAt.toDateString()}</span> */}
       <div style={{ marginLeft: "auto" }} className="grid place-items-center">
-        <CopyButtonWithTooltip ref={copyTooltipRef}>Copy</CopyButtonWithTooltip>
+        <CopyButtonWithTooltip ref={copyTooltipRef}>Copied</CopyButtonWithTooltip>
         <button
           onClick={() => handleDelete(value.id)}
           className="bg-red-600 text-white rounded-full text-sm h-5 w-5 grid place-items-center"

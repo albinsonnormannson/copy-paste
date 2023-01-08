@@ -1,29 +1,30 @@
-import { datasource } from "../../../utils/datasource"
+import { db } from "../../../utils/datasource";
+import { remoteDB } from "../../../utils/remoteDB";
 
 export const getClipboardItems = async () => {
-    const clipboardItems = await datasource((prisma) => {
-        return prisma.clipboardItem.findMany({
-            orderBy: {
-                id: 'desc'
-            }
-        });
+  const clipboardItems = await db.execute((prisma) => {
+    return prisma.clipboardItem.findMany({
+      orderBy: {
+        id: "desc",
+      },
     });
-    return clipboardItems;
-}
+  });
+  return clipboardItems;
+};
 
 export const addNewClipboardItem = async (content: string) => {
-    const newClipboardItem = await datasource((prisma) => {
-        return prisma.clipboardItem.create({
-          data: {
-            content
-          },
-        });
-      });
-      return newClipboardItem;
-}
+  const newClipboardItem = await db.execute((prisma) => {
+    return prisma.clipboardItem.create({
+      data: {
+        content,
+      },
+    });
+  });
+  return newClipboardItem;
+};
 
 export const deleteClipboardItem = async (id: number) => {
-  const deleted = await datasource((prisma) => {
+  const deleted = await db.execute((prisma) => {
     return prisma.clipboardItem.delete({
       where: {
         id,
@@ -31,4 +32,16 @@ export const deleteClipboardItem = async (id: number) => {
     });
   });
   return deleted;
-}
+};
+
+export const getRemoteClipboardItems = async () => {
+  const clipboardItems = await remoteDB.execute((prisma) => {
+    return prisma.clipboardItem.findMany({
+      orderBy: {
+        id: "desc",
+      },
+    });
+  });
+
+  return clipboardItems;
+};

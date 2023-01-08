@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-.tooltip { 
+/* .tooltip { 
     opacity: 0;
     transition: opacity 2s;
     z-index: -1;
@@ -28,4 +28,4 @@
 .tooltip[data-show="false"] {
     opacity: 0;
     z-index: 1;
-}
+} */

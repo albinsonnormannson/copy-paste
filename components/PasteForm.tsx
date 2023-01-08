@@ -25,6 +25,7 @@ export const PasteForm = () => {
     if (pasteInputField === "") {
       return;
     }
+    sentTooltip.toggleTooltip("Sending");
     const newClipboardItem = fetch("/api/clipboard", {
       method: "POST",
       headers: {
@@ -36,10 +37,12 @@ export const PasteForm = () => {
     })
       .then((res) => res.json())
       .then((newClipboardItem) => {
-        setClipboard((prevClipboardItems) => [newClipboardItem, ...prevClipboardItems]);
+        setClipboard((prevClipboardItems) => [
+          newClipboardItem,
+          ...prevClipboardItems,
+        ]);
         setPasteInputField("");
-        // sentTooltip.setTooltip("Sento");
-        sentTooltip.toggleTooltip();
+        sentTooltip.toggleTooltip("Sent");
       })
       .catch((e) => alert(e));
   };
