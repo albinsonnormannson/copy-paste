@@ -1,5 +1,5 @@
-import { db } from "../../../utils/datasource";
-import { remoteDB } from "../../../utils/remoteDB";
+import { ClipboardItem } from "@prisma/client";
+import { db, RemoteDatasource, remoteDB } from "../../../utils/datasource";
 
 export const getClipboardItems = async () => {
   const clipboardItems = await db.execute((prisma) => {
@@ -25,9 +25,10 @@ export const addNewClipboardItem = async (content: string) => {
 
 export const deleteClipboardItem = async (id: number) => {
   const deleted = await db.execute((prisma) => {
-    return prisma.clipboardItem.delete({
+    return prisma.clipboardItem.deleteMany({
       where: {
         id,
+        remote: false,
       },
     });
   });
@@ -44,4 +45,28 @@ export const getRemoteClipboardItems = async () => {
   });
 
   return clipboardItems;
+};
+
+export const addNewRemoteClipboardItem = async (content: string) => {
+  const newClipboardItem = await remoteDB.execute((prisma) => {
+    return prisma.clipboardItem.create({
+      data: {
+        content,
+        remote: true,
+      },
+    });
+  });
+  return newClipboardItem;
+};
+
+export const deleteRemoteClipboardItem = async (id: number) => {
+  const deleteClipboardItem =
+    await RemoteDatasource.getDefaultRemoteDatasource().execute((prisma) => {
+      return prisma.clipboardItem.deleteMany({
+        where: {
+          id,
+          remote: true,
+        },
+      });
+    });
 };
