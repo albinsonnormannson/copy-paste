@@ -1,4 +1,5 @@
 import { PrismaClient, PrismaPromise } from "@prisma/client";
+import { RemotePrismaClient } from "../prisma-client/remote-client";
 
 // export type PrismaDatasource<T> =  (prismaClient: PrismaClient,
 //     callback: (prismaClient: PrismaClient) => T) =>
@@ -46,5 +47,35 @@ export class Datasource {
   }
 }
 
+export class RemoteDatasource {
+  prismaClient = new RemotePrismaClient();
+
+  constructor(prismaClient?: RemotePrismaClient) {
+    if (prismaClient instanceof RemotePrismaClient) {
+      this.prismaClient = prismaClient;
+    }
+  }
+
+  async execute<T>(callback: (prismaClient: RemotePrismaClient) => T) {
+    const promise = new Promise((resolve, reject) => {
+      try {
+        const result = callback(this.prismaClient);
+        resolve(result);
+      } catch (e) {
+        reject(e);
+      }
+      this.prismaClient.$disconnect();
+    });
+    return promise as T;
+  }
+
+  static getDefaultRemoteDatasource() {
+    return new RemoteDatasource();
+  }
+}
+
 const db = new Datasource();
 export { db };
+
+const remoteDB = new RemoteDatasource();
+export { remoteDB };
