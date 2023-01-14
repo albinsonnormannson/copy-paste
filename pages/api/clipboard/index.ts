@@ -1,7 +1,5 @@
 import type { ClipboardItem } from "@prisma/client";
-import {
-  PrismaClientKnownRequestError,
-} from "@prisma/client/runtime";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import { NextApiHandler } from "next";
 import isOnline from "is-online";
 import { PrismaClientKnownRequestError as RemotePrismaClientKnownRequestError } from "../../../prisma-client/remote-prisma-client/runtime";
@@ -13,6 +11,8 @@ import {
   deleteRemoteClipboardItem,
   getClipboardItems,
   getRemoteClipboardItems,
+  updateClipboardItem,
+  updateRemoteClipboardItem,
 } from "../controllers/clipboard.controller";
 import {
   isPrismaClientKnownRequestError,
@@ -74,28 +74,57 @@ const handler: NextApiHandler = async (req, res) => {
         res.status(500).json({ message: e });
       }
     case "DELETE":
-      const { id, remote } = req.body;
-      if (id == "undefined") {
-        return;
+      {
+        const { id, remote } = req.body;
+        if (id == "undefined") {
+          return;
+        }
+        try {
+          let deleted;
+          if (remote) {
+            deleted = await deleteRemoteClipboardItem(Number(id));
+          } else {
+            deleted = await deleteClipboardItem(Number(id));
+          }
+          res.json(deleted);
+        } catch (e) {
+          if (
+            isPrismaClientKnownRequestError(e) ||
+            isRemotePrismaClientKnownRequestError(e)
+          ) {
+            return res.status(404).json({ message: e.meta?.cause, remote });
+          }
+          return res.status(500).json({ message: e });
+        }
+      }
+      break;
+    case "PUT": {
+      const { id, remote, ...dataToUpdate } = req.body;
+      if (!id) {
+        return res
+          .status(400)
+          .json({ message: "ID of item to update is required" });
       }
       try {
-        let deleted;
         if (remote) {
-          deleted = await deleteRemoteClipboardItem(Number(id));
+          const updatedItems = await updateRemoteClipboardItem(
+            id,
+            dataToUpdate
+          );
+          res.json(updatedItems);
         } else {
-          deleted = await deleteClipboardItem(Number(id));
+          const updatedItems = await updateClipboardItem(id, dataToUpdate);
+          res.json(updatedItems);
         }
-        res.json(deleted);
       } catch (e) {
         if (
           isPrismaClientKnownRequestError(e) ||
           isRemotePrismaClientKnownRequestError(e)
         ) {
-          return res.status(404).json({ message: e.meta?.cause, remote });
+          res.status(500).json({ message: e.meta?.cause });
         }
-        return res.status(500).json({ message: e });
       }
-      break;
+    }
   }
 };
 

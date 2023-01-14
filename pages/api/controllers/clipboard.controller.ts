@@ -35,6 +35,23 @@ export const deleteClipboardItem = async (id: number) => {
   return deleted;
 };
 
+export const updateClipboardItem = async <T extends ClipboardItem>(
+  id: number,
+  dataToUpdate: T
+) => {
+  const updatedItem = await db.execute((prisma) => {
+    return prisma.clipboardItem.update({
+      where: {
+        id,
+      },
+      data: {
+        ...dataToUpdate,
+      },
+    });
+  });
+  return updatedItem;
+};
+
 export const getRemoteClipboardItems = async () => {
   const clipboardItems = await remoteDB.execute((prisma) => {
     return prisma.clipboardItem.findMany({
@@ -60,7 +77,7 @@ export const addNewRemoteClipboardItem = async (content: string) => {
 };
 
 export const deleteRemoteClipboardItem = async (id: number) => {
-  const deleteClipboardItem =
+  const deletedClipboardItem =
     await RemoteDatasource.getDefaultRemoteDatasource().execute((prisma) => {
       return prisma.clipboardItem.deleteMany({
         where: {
@@ -69,4 +86,22 @@ export const deleteRemoteClipboardItem = async (id: number) => {
         },
       });
     });
+  return deletedClipboardItem;
+};
+
+export const updateRemoteClipboardItem = async <T extends ClipboardItem>(
+  id: number,
+  dataToUpdate: T
+) => {
+  const updatedItem = await db.execute((prisma) => {
+    return prisma.clipboardItem.update({
+      where: {
+        id,
+      },
+      data: {
+        ...dataToUpdate,
+      },
+    });
+  });
+  return updatedItem;
 };

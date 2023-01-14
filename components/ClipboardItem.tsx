@@ -1,17 +1,30 @@
 import { ClipboardItem as LocalDatabaseClipboardItem } from "@prisma/client";
 import { ClipboardItem as RemoteDatabseClipboardItem } from "../prisma-client/remote-prisma-client";
-import React, { useRef, createRef } from "react";
-import { AiFillDelete, AiOutlineDelete } from "react-icons/ai";
+import React, { useRef, useState } from "react";
+import {
+  AiFillDelete,
+  AiOutlineDelete,
+  AiFillEyeInvisible,
+  AiFillEye,
+} from "react-icons/ai";
 import { FaPaste, FaCopy } from "react-icons/fa";
 import { useClipboardContext } from "./context/ClipboardContext";
-import { TooltipElement, TooltipRefType, useTooltip, withTooltip } from "./Tooltip";
+import {
+  TooltipElement,
+  TooltipRefType,
+  useTooltip,
+  withTooltip,
+} from "./Tooltip";
 
-export type ClipboardItem = LocalDatabaseClipboardItem | RemoteDatabseClipboardItem;
+export type ClipboardItem =
+  | LocalDatabaseClipboardItem
+  | RemoteDatabseClipboardItem;
 
 export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
   const copyTooltipRef = useRef<TooltipElement>(null) as TooltipRefType;
   const copyTooltip = useTooltip(copyTooltipRef);
   const { setClipboard } = useClipboardContext();
+  // const [itemVisible, setItemVisible] = useState(value.visible);
 
   const handleCopy = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -40,6 +53,38 @@ export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
       });
   };
 
+  const toggleItemVisibility = (e: any) => {
+    e.target.disabled = true;
+    fetch("/api/clipboard", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "PUT",
+      body: JSON.stringify({
+        id: value.id,
+        visible: !value.visible,
+        remote: value.remote
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setClipboard((prevClipboardItems) => {
+          return prevClipboardItems.map((prevClipboardItem) => {
+            if (prevClipboardItem.id === value.id) {
+              return data;
+            }
+            return prevClipboardItem;
+          });
+        });
+      })
+      .catch((e) => {
+        alert("Unable to update item visibility");
+      })
+      .finally(() => {
+        e.target.disabled = false;
+      });
+  };
+
   const CopyButtonWithTooltip = withTooltip(
     () => (
       <button className="text-xl text-green-700" onClick={handleCopy}>
@@ -55,10 +100,26 @@ export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
 
   return (
     <div className="flex py-2 px-4 mb-2 bg-orange-200 rounded-sm">
-      <div className="max-w-[90%] break-words">{value.content}</div>
-      <span className="text-sm text-green-300">{value.createdAt.toDateString()}</span>
+      <div
+        className="max-w-[90%] flex flex-col"
+        style={{ flexDirection: "column" }}
+      >
+        <div className="break-words">{value.visible ? value.content : '***'}</div>
+        <span className="text-xs text-green-900">
+          {new Date(value.createdAt).toDateString()} |{" "}
+          {value.remote ? "remote" : "local"}
+          <button
+            className="mr-3 text-sm"
+            onClick={toggleItemVisibility}
+          >
+            {value.visible ? <AiFillEyeInvisible /> : <AiFillEye />}
+          </button>
+        </span>
+      </div>
       <div style={{ marginLeft: "auto" }} className="grid place-items-center">
-        <CopyButtonWithTooltip ref={copyTooltipRef}>Copied</CopyButtonWithTooltip>
+        <CopyButtonWithTooltip ref={copyTooltipRef}>
+          Copied
+        </CopyButtonWithTooltip>
         <button
           onClick={() => handleDelete(value.id)}
           className="bg-red-600 text-white rounded-full text-sm h-5 w-5 grid place-items-center"
