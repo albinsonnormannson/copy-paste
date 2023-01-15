@@ -50,15 +50,17 @@ export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
       });
   };
 
-  const toggleItemVisibility = (e: any) => {
-    e.target.disabled = true;
+  const toggleItemVisibility = (id: number) => {
+    console.log(id);
+    // TODO: IMPLEMENT DISABLING THE TOGGLE VISIBILITY BUTTON WHILE REQUEST IS BEING MADE
+    // e.target.disabled = true;
     fetch("/api/clipboard", {
       headers: {
         "Content-Type": "application/json",
       },
       method: "PUT",
       body: JSON.stringify({
-        id: value.id,
+        id,
         visible: !value.visible,
         remote: value.remote,
       }),
@@ -67,7 +69,7 @@ export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
       .then((data) => {
         setClipboard((prevClipboardItems) => {
           return prevClipboardItems.map((prevClipboardItem) => {
-            if (prevClipboardItem.id === value.id) {
+            if (prevClipboardItem.id === id) {
               return data;
             }
             return prevClipboardItem;
@@ -78,7 +80,7 @@ export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
         alert("Unable to update item visibility");
       })
       .finally(() => {
-        e.target.disabled = false;
+        // e.target.disabled = false;
       });
   };
 
@@ -107,7 +109,7 @@ export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
         <span className="text-xs text-green-900">
           {new Date(value.createdAt).toDateString()} |{" "}
           {value.remote ? "remote" : "local"}
-          <button className="mr-3 text-sm" onClick={toggleItemVisibility}>
+          <button className="mr-3 text-sm" onClick={() => toggleItemVisibility(value.id)}>
             {value.visible ? <AiFillEyeInvisible /> : <AiFillEye />}
           </button>
         </span>
