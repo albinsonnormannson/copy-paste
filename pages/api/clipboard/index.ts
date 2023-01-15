@@ -2,7 +2,6 @@ import type { ClipboardItem } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import { NextApiHandler } from "next";
 import isOnline from "is-online";
-import { PrismaClientKnownRequestError as RemotePrismaClientKnownRequestError } from "../../../prisma-client/remote-prisma-client/runtime";
 
 import {
   addNewClipboardItem,
@@ -14,10 +13,7 @@ import {
   updateClipboardItem,
   updateRemoteClipboardItem,
 } from "../controllers/clipboard.controller";
-import {
-  isPrismaClientKnownRequestError,
-  isRemotePrismaClientKnownRequestError,
-} from "../../../utils/assertions";
+import { isPrismaClientKnownRequestError } from "../../../utils/assertions";
 
 const handler: NextApiHandler = async (req, res) => {
   switch (req.method) {
@@ -43,11 +39,7 @@ const handler: NextApiHandler = async (req, res) => {
         });
         res.json(combinedResponse);
       } catch (e) {
-        if (
-          e &&
-          (e instanceof PrismaClientKnownRequestError ||
-            e instanceof RemotePrismaClientKnownRequestError)
-        ) {
+        if (e && e instanceof PrismaClientKnownRequestError) {
           return res.status(500).json({ message: e.meta?.cause });
         }
         res.status(500).json({ message: e });
@@ -64,11 +56,7 @@ const handler: NextApiHandler = async (req, res) => {
           res.json(newClipboardItem);
         }
       } catch (e) {
-        if (
-          e &&
-          (e instanceof PrismaClientKnownRequestError ||
-            e instanceof RemotePrismaClientKnownRequestError)
-        ) {
+        if (e && e instanceof PrismaClientKnownRequestError) {
           return res.status(500).json({ message: e.meta?.cause });
         }
         res.status(500).json({ message: e });
@@ -88,10 +76,7 @@ const handler: NextApiHandler = async (req, res) => {
           }
           res.json(deleted);
         } catch (e) {
-          if (
-            isPrismaClientKnownRequestError(e) ||
-            isRemotePrismaClientKnownRequestError(e)
-          ) {
+          if (isPrismaClientKnownRequestError(e)) {
             return res.status(404).json({ message: e.meta?.cause, remote });
           }
           return res.status(500).json({ message: e });
@@ -117,10 +102,7 @@ const handler: NextApiHandler = async (req, res) => {
           res.json(updatedItems);
         }
       } catch (e) {
-        if (
-          isPrismaClientKnownRequestError(e) ||
-          isRemotePrismaClientKnownRequestError(e)
-        ) {
+        if (isPrismaClientKnownRequestError(e)) {
           res.status(500).json({ message: e.meta?.cause });
         }
       }
