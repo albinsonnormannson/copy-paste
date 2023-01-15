@@ -35,9 +35,9 @@ export const deleteClipboardItem = async (id: number) => {
   return deleted;
 };
 
-export const updateClipboardItem = async <T extends ClipboardItem>(
+export const updateClipboardItem = async (
   id: number,
-  dataToUpdate: T
+  dataToUpdate: Partial<ClipboardItem>
 ) => {
   const updatedItem = await db.execute((prisma) => {
     return prisma.clipboardItem.update({
@@ -89,9 +89,9 @@ export const deleteRemoteClipboardItem = async (id: number) => {
   return deletedClipboardItem;
 };
 
-export const updateRemoteClipboardItem = async <T extends ClipboardItem>(
+export const updateRemoteClipboardItem = async (
   id: number,
-  dataToUpdate: T
+  dataToUpdate: Partial<ClipboardItem>
 ) => {
   const updatedItem = await db.execute((prisma) => {
     return prisma.clipboardItem.update({
