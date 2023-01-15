@@ -1,5 +1,5 @@
-import isOnline from "is-online";
+// import isOnline from "is-online";
 
-console.log(await isOnline());
+// console.log(await isOnline());
 
-export {}
+// export {}
