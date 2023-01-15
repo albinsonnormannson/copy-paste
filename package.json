@@ -8,10 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "migrate-dev:local": "prisma migrate dev --schema=./prisma/schema.prisma",
-    "migrate:local": "prisma migrate deploy  --create-only --schema=./prisma/schema.prisma",
+    "migrate:local": "prisma migrate deploy --schema=./prisma/schema.prisma",
     "generate:local": "prisma generate --schema=./prisma/schema.prisma",
     "migrate-dev:remote": "prisma migrate dev --schema=./prisma/remote/schema.prisma",
-    "migrate:remote": "prisma migrate deploy --create-only --schema=./prisma/remote/schema.prisma",
+    "migrate:remote": "prisma migrate deploy --schema=./prisma/remote/schema.prisma",
     "generate:remote": "prisma generate --schema=./prisma/remote/schema.prisma"
   },
   "dependencies": {
