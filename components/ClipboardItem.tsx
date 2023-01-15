@@ -1,5 +1,4 @@
-import { ClipboardItem as LocalDatabaseClipboardItem } from "@prisma/client";
-import { ClipboardItem as RemoteDatabseClipboardItem } from "../prisma-client/remote-prisma-client";
+import { ClipboardItem as DatabaseClipboardType } from "@prisma/client";
 import React, { useRef, useState } from "react";
 import {
   AiFillDelete,
@@ -16,9 +15,7 @@ import {
   withTooltip,
 } from "./Tooltip";
 
-export type ClipboardItem =
-  | LocalDatabaseClipboardItem
-  | RemoteDatabseClipboardItem;
+export type ClipboardItem = DatabaseClipboardType;
 
 export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
   const copyTooltipRef = useRef<TooltipElement>(null) as TooltipRefType;
@@ -63,7 +60,7 @@ export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
       body: JSON.stringify({
         id: value.id,
         visible: !value.visible,
-        remote: value.remote
+        remote: value.remote,
       }),
     })
       .then((res) => res.json())
@@ -104,14 +101,13 @@ export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
         className="max-w-[90%] flex flex-col"
         style={{ flexDirection: "column" }}
       >
-        <div className="break-words">{value.visible ? value.content : '***'}</div>
+        <div className="break-words">
+          {value.visible ? value.content : "***"}
+        </div>
         <span className="text-xs text-green-900">
           {new Date(value.createdAt).toDateString()} |{" "}
           {value.remote ? "remote" : "local"}
-          <button
-            className="mr-3 text-sm"
-            onClick={toggleItemVisibility}
-          >
+          <button className="mr-3 text-sm" onClick={toggleItemVisibility}>
             {value.visible ? <AiFillEyeInvisible /> : <AiFillEye />}
           </button>
         </span>
