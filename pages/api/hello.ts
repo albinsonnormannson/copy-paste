@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ClipboardItem } from "../../components/ClipboardItem";
-import { RemoteDatasource, remoteDB } from "../../utils/datasource";
+import { remoteDB } from "../../utils/datasource";
 
 export default async function handler(
   req: NextApiRequest,
@@ -25,15 +25,13 @@ export default async function handler(
   // res.json(remoteItems);
   const item: ClipboardItem = req.body;
 
-  const addedItems = await RemoteDatasource.getDefaultRemoteDatasource().execute(
-    (prisma) => {
-      return prisma.clipboardItem.create({
-        data: {
-          content: "dfdf",
-          remote: true
-        },
-      });
-    }
-  );
+  const addedItems = await remoteDB.execute((prisma) => {
+    return prisma.clipboardItem.create({
+      data: {
+        content: "dfdf",
+        remote: true,
+      },
+    });
+  });
   res.json(addedItems);
 }
