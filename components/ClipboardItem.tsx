@@ -27,10 +27,14 @@ export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(value.content);
 
-    await navigator.clipboard.writeText(value.content);
-
-    copyTooltip.toggleTooltip();
+      copyTooltip.toggleTooltip();
+    } else {
+      // TODO: REPLACE WITH REACT-HOT TOAST
+      alert("Cannot copy to clipboard at this time, please give permissions");
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -109,7 +113,10 @@ export const ClipboardItem = ({ value }: { value: ClipboardItem }) => {
         <span className="text-xs text-green-900">
           {new Date(value.createdAt).toDateString()} |{" "}
           {value.remote ? "remote" : "local"}
-          <button className="mr-3 text-sm" onClick={() => toggleItemVisibility(value.id)}>
+          <button
+            className="mr-3 text-sm"
+            onClick={() => toggleItemVisibility(value.id)}
+          >
             {value.visible ? <AiFillEyeInvisible /> : <AiFillEye />}
           </button>
         </span>
