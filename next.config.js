@@ -2,6 +2,7 @@
 const nextConfig = {
   experimental: {
     // swcPlugins: [["next-superjson-plugin", {}]],
+    appDir: true,
   },
 };
 
