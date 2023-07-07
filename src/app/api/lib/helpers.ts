@@ -14,7 +14,7 @@ export const DefaultErrorResponse = async function (e: unknown) {
     if (e instanceof CustomError) {
       return NextResponse.json(errorResponse, { status: e.statusCode });
     } else if (isPrismaClientKnownRequestError(e)) {
-      errorResponse.message = e.meta?.cause;
+      errorResponse.message = e.message;
       return NextResponse.json(errorResponse, { status: 500 });
     } else {
       if (process.env.NODE_ENV === "production") {
