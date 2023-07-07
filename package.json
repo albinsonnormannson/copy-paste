@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "yarn generate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "generate": "cd ./prisma/local && npx prisma generate && cd ../remote && npx prisma generate",
     "migrate-dev": "cd ./prisma/local && npx prisma migrate dev && cd ../remote && npx prisma migrate dev",
+    "migrate-remote": "cd ./prisma/remote && npx prisma migrate deploy",
     "remote-studio": "cd ./prisma/remote && npx prisma studio",
     "local-studio": "cd ./prisma/local && npx prisma studio"
   },
